@@ -56,3 +56,4 @@ AUDIO_ENABLE = no
 RGBLIGHT_ENABLE = yes
 
 LAYOUTS = 60_ansi 60_ansi_split_bs_rshift 60_hhkb 60_iso
+TAP_DANCE_ENABLE = yes
