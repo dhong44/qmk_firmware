@@ -66,12 +66,20 @@ enum {
   ALT_OSL1 = 0,
   MOD_BASE = 1,
   MOD_SL = 2,
-  MOD_ML = 3
+  MOD_ML = 3,
+  ALT_MINI = 4
+};
+
+enum {
+    TO_MINI = SAFE_RANGE,
+    TO_60
 };
 
 int cur_dance (qk_tap_dance_state_t *state);
 void alt_finished (qk_tap_dance_state_t *state, void *user_data);
 void alt_reset (qk_tap_dance_state_t *state, void *user_data);
+void mini_alt_finished (qk_tap_dance_state_t *state, void *user_data);
+void mini_alt_reset (qk_tap_dance_state_t *state, void *user_data);
 void base_finished (qk_tap_dance_state_t *state, void *user_data);
 void base_reset (qk_tap_dance_state_t *state, void *user_data);
 void sl_finished (qk_tap_dance_state_t *state, void *user_data);
@@ -107,20 +115,33 @@ void ml_reset (qk_tap_dance_state_t *state, void *user_data);
     { k40,  k41,   KC_NO, k43,  k44,   KC_NO, k46,  KC_NO, k48,   KC_NO, k4a,  k4b,  KC_NO, k4d,   k4e   }  \
 }
 
-/*
-* Each layer gets a name for readability.
-* The underscores don't mean anything - you can
-* have a layer called STUFF or any other name.
-* Layer names don't all need to be of the same
-* length, and you can also skip them entirely
-* and just use numbers.
-*
-*/
+#define LAYOUT_minivan( k2d, \
+    k10,      k12, k13, k14, k15, k16, k17, k18, k19, k1a, k1b, k1c,      \
+    k20,      k22, k23, k24, k25, k26, k27, k28, k29, k2a, k2b, k2c,      \
+    k30,      k32, k33, k34, k35, k36, k37, k38, k39, k3a, k3b,      k3d,      \
+    k40, k41,      k43, k44,            k48,      k4a, k4b,      k4d \
+) { \
+    { KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,KC_NO,KC_NO,KC_NO }, \
+    { k10,  KC_NO, k12,   k13,  k14,   k15,   k16,  k17,   k18,   k19,   k1a,  k1b,  k1c,KC_NO,   KC_NO   }, \
+    { k20,  KC_NO, k22,   k23,  k24,   k25,   k26,  k27,   k28,   k29,   k2a,  k2b,  k2c,k2d,   KC_NO }, \
+    { k30,  KC_NO,   k32,   k33,  k34,   k35,   k36,  k37,   k38,   k39,   k3a,  k3b,  KC_NO, k3d,   KC_NO }, \
+    { k40,  k41,   KC_NO, k43,  k44,   KC_NO, KC_NO, KC_NO, k48,   KC_NO, k4a,  k4b,  KC_NO, k4d,   KC_NO   } \
+}
+
+// Layers for full 60 layout
+
 #define QWERTY 0     // Base Layer
 #define SL 1         // Secondary Layer
 #define ML 2         // Mouse Layer
 #define ML2 3        // Mouse Layer
 #define FN 4         // Function Layer
+
+// Layers for minivan
+
+#define BASE 5
+#define NUMBERS 6
+#define ARROWS 7
+#define FNMINI 8
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
@@ -142,7 +163,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     //  1          2          3          4          5          6          7          8          9          10         11         12         13         14         15
         KC_GESC,   KC_1,      KC_2,      KC_3,      KC_4,      KC_5,      KC_6,      KC_7,      KC_8,      KC_9,      KC_0,      KC_MINS,   KC_EQL,    KC_GRV,    KC_DEL,
         KC_TAB ,   KC_Q,      KC_W,      KC_E,      KC_R,      KC_T,      KC_Y,      KC_U,      KC_I,      KC_O,      KC_P,      KC_LBRC,   KC_RBRC,
-        KC_BSPC,   KC_A,      KC_S,      KC_D,      KC_F,      KC_G,      KC_H,      KC_J,      KC_K,      KC_L,      KC_SCLN,   KC_QUOT,   KC_BSLS,   TO(ML),
+        KC_BSPC,   KC_A,      KC_S,      KC_D,      KC_F,      KC_G,      KC_H,      KC_J,      KC_K,      KC_L,      KC_SCLN,   KC_QUOT,   KC_BSLS,   TO_MINI,
         KC_LSFT,   KC_Z,      KC_X,      KC_C,      KC_V,      KC_B,      KC_N,      KC_M,      KC_COMM,   KC_DOT,    KC_SLSH,   KC_RSFT,
         KC_LCTL,   KC_LGUI,   TD(ALT_OSL1), KC_SPC, TD(MOD_BASE), KC_ENT, MO(FN),    KC_RALT,   KC_MENU,   KC_RCTL),
 
@@ -164,7 +185,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     //  1          2          3          4          5          6          7          8          9          10         11         12         13         14         15
         _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,
         _______,   KC_HOME,   KC_UP,     KC_END,    KC_PGUP,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,
-        _______,    KC_LEFT,  KC_DOWN,   KC_RIGHT,  KC_PGDN,   _______,   KC_LEFT,   KC_DOWN,   KC_UP,     KC_RIGHT,  _______,   _______,   _______,   TO(ML),
+        _______,    KC_LEFT,  KC_DOWN,   KC_RIGHT,  KC_PGDN,   _______,   KC_LEFT,   KC_DOWN,   KC_UP,     KC_RIGHT,  _______,   _______,   _______,   _______,
         _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,
         _______,   _______,   _______,   _______,   TD(MOD_SL),   _______,   _______,   _______,   _______,   _______),
 
@@ -186,7 +207,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     //  1          2          3          4          5          6          7          8          9          10         11         12         13         14         15
         _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,
         _______,   KC_BTN1,   KC_MS_U,   KC_BTN2,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,
-        _______,   KC_MS_L,   KC_MS_D,   KC_MS_R,   _______,   _______,   KC_MS_L,   KC_MS_D,   KC_MS_U,   KC_MS_R,   _______,   _______,   _______,   TG(ML),
+        _______,   KC_MS_L,   KC_MS_D,   KC_MS_R,   _______,   _______,   KC_MS_L,   KC_MS_D,   KC_MS_U,   KC_MS_R,   _______,   _______,   _______,   _______,
         _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,
         _______,   _______,   _______,   KC_BTN1,   TD(MOD_ML),   KC_BTN2,   _______,   _______,   _______,   _______),
 
@@ -236,52 +257,33 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         _______,   _______,   _______,   _______,   KC_NO,     _______,   _______,   _______,   _______,   _______),
 
 
+   [BASE] = LAYOUT_minivan(   TO_60,
+    //  1          2          3          4          5          6          7          8          9          10         11         12         13         14         15
+        KC_TAB ,   KC_Q,      KC_W,      KC_E,      KC_R,      KC_T,      KC_Y,      KC_U,      KC_I,      KC_O,      KC_P,      KC_LBRC,
+        KC_BSPC,   KC_A,      KC_S,      KC_D,      KC_F,      KC_G,      KC_H,      KC_J,      KC_K,      KC_L,      KC_SCLN,   KC_QUOT,
+        KC_LSFT,   KC_Z,      KC_X,      KC_C,      KC_V,      KC_B,      KC_N,      KC_M,      KC_COMM,   KC_DOT,    KC_SLSH,   KC_RSFT,
+        KC_LCTL,   KC_LGUI,   TD(ALT_MINI), LT(NUMBERS, KC_SPC),     LT(ARROWS, KC_ENT),    MO(FNMINI),  TO(NUMBERS),   TO(ARROWS)),
 
-//   /* Keymap FN: Function Layer
-//    *
-//    * ,-----------------------------------------------------------.
-//    * |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
-//    * |-----------------------------------------------------------|
-//    * |     |   |   |   |   |   |   |   |   |   |   |   |   |     |
-//    * |------------------------------------------------------     |
-//    * |       |   |   |   |   |   |   |   |   |   |   |   |   |   |
-//    * |-----------------------------------------------------------|
-//    * |    |   |   |   |   |   |   |   |    |   |   |   |         |
-//    * |-----------------------------------------------------------|
-//    * |    |    |    |        |    |         |    |    |    |     |
-//    * `-----------------------------------------------------------'
-//    */
-//    [15] = LAYOUT_60_ansi_iso_split(
-//     //  1          2          3          4          5          6          7          8          9          10         11         12         13         14         15
-//         _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,
-//         _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,
-//         _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,
-//         _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,
-//         _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______),
+   [NUMBERS] = LAYOUT_minivan(_______,
+    //  1          2          3          4          5          6          7          8          9          10         11         12         13         14         15
+        KC_MINS,   KC_1,      KC_2,      KC_3,      KC_4,      KC_5,      KC_6,      KC_7,      KC_8,      KC_9,      KC_0,      KC_EQL,
+        _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,
+        _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,
+        _______,   _______,   _______,   _______,              KC_ENT,    _______,   TO(BASE),   _______),
 
+   [ARROWS] = LAYOUT_minivan(_______,
+    //  1          2          3          4          5          6          7          8          9          10         11         12         13         14         15
+        KC_ESC,    KC_HOME,   KC_UP,     KC_END,    _______,   _______,   _______,   _______,   _______,   _______,   _______,   KC_RBRC,
+        KC_DELT,   KC_LEFT,   KC_DOWN,   KC_RIGHT,  _______,   _______,   KC_LEFT,   KC_DOWN,   KC_UP,     KC_RIGHT,  _______,   KC_GRAVE,
+        _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   KC_BSLS,   _______,
+        _______,   _______,   _______,   KC_SPC,               _______,   _______,   _______,   TO(BASE)),
 
-//   /* Keymap RL: RGB Layer
-//    *
-//    * ,-----------------------------------------------------------.
-//    * |BL |   |   |   |   |   |   |   |   |   |   |   |   |Reset  |
-//    * |-----------------------------------------------------------|
-//    * |     |tog|mod|hui|hud|   |   |sai|sad|vai|vad|   |   |     |
-//    * |------------------------------------------------------     |
-//    * |       |sta|bre|rai|swi|   |   |sna|kni|gra|xms|   |   |   |
-//    * |-----------------------------------------------------------|
-//    * |    |   |bd |bt |bi |bs |   |   |   |   |   |   |          |
-//    * |-----------------------------------------------------------|
-//    * |    |    |    |        |    |         |    |    | BL |     |
-//    * `-----------------------------------------------------------'
-//    */
-//    [RL] = LAYOUT_60_ansi_iso_split(
-//     //  1          2          3          4          5          6          7          8          9          10         11         12         13         14
-//         TG(RL),    _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   RESET,
-//         _______,   RGB_TOG,   RGB_MOD,   RGB_HUI,   RGB_HUD,   _______,   _______,   RGB_SAI,   RGB_SAD,   RGB_VAI,   RGB_VAD,   _______,   _______,
-//         _______,   RGB_STA,   RGB_BRE,   RGB_RAI,   RGB_SWI,   _______,   _______,   RGB_SNA,   RGB_KNI,   RGB_GRA,   RGB_XMS,   _______,   _______,   _______,
-//         _______,   BL_DEC,    BL_TOGG,   BL_INC,    BL_STEP,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,
-//         _______,   _______,   _______,   _______,   MO(FL),    _______,   _______,   _______,   TO(BL),    _______),
-
+   [FNMINI] = LAYOUT_minivan(KC_NO,
+    //  1          2          3          4          5          6          7          8          9          10         11         12         13         14         15
+        KC_F11,    KC_F1,     KC_F2,     KC_F3,     KC_F4,     KC_F5,     KC_F6,     KC_F7,     KC_F8,     KC_F9,     KC_F10,    KC_F12,
+        _______,   KC_MUTE,   KC_VOLD,   KC_VOLU,   _______,   _______,   _______,   _______,   _______,   RGB_VAD,   RGB_VAI,   _______,
+        _______,   KC_MPRV,   KC_MPLY,   KC_MNXT,   _______,   _______,   _______,   _______,   _______,   KC_BRID,   KC_BRIU,   _______,
+        RESET,     _______,   _______,   _______,              _______,   _______,   _______,   _______)
 
 };
 
@@ -316,8 +318,9 @@ static tap alttap_state = {
 qk_tap_dance_action_t tap_dance_actions[] = {
   [ALT_OSL1]     = ACTION_TAP_DANCE_FN_ADVANCED(NULL,alt_finished, alt_reset),
   [MOD_BASE]     = ACTION_TAP_DANCE_FN_ADVANCED(NULL,base_finished, base_reset),
-  [MOD_SL]     = ACTION_TAP_DANCE_FN_ADVANCED(NULL,sl_finished, sl_reset),
-  [MOD_ML]     = ACTION_TAP_DANCE_FN_ADVANCED(NULL,ml_finished, ml_reset)
+  [MOD_SL]       = ACTION_TAP_DANCE_FN_ADVANCED(NULL,sl_finished, sl_reset),
+  [MOD_ML]       = ACTION_TAP_DANCE_FN_ADVANCED(NULL,ml_finished, ml_reset),
+  [ALT_MINI]     = ACTION_TAP_DANCE_FN_ADVANCED(NULL,mini_alt_finished, mini_alt_reset)
 };
 
 
@@ -434,6 +437,29 @@ void alt_reset (qk_tap_dance_state_t *state, void *user_data) {
   alttap_state.state = 0;
 }
 
+void mini_alt_finished (qk_tap_dance_state_t *state, void *user_data) {
+  alttap_state.state = cur_dance(state);
+  switch (alttap_state.state) {
+    case SINGLE_TAP: set_oneshot_layer(FNMINI, ONESHOT_START); clear_oneshot_layer_state(ONESHOT_PRESSED); break;
+    case SINGLE_HOLD: register_code(KC_LALT); break;
+    case DOUBLE_TAP: set_oneshot_layer(FNMINI, ONESHOT_START); clear_oneshot_layer_state(ONESHOT_PRESSED); break;
+    case DOUBLE_HOLD: register_code(KC_LALT); layer_on(FN); break;
+    //Last case is for fast typing. Assuming your key is `f`:
+    //For example, when typing the word `buffer`, and you want to make sure that you send `ff` and not `Esc`.
+    //In order to type `ff` when typing fast, the next character will have to be hit within the `TAPPING_TERM`, which by default is 200ms.
+  }
+}
+
+void mini_alt_reset (qk_tap_dance_state_t *state, void *user_data) {
+  switch (alttap_state.state) {
+    case SINGLE_TAP: break;
+    case SINGLE_HOLD: unregister_code(KC_LALT); break;
+    case DOUBLE_TAP: break;
+    case DOUBLE_HOLD: layer_off(FN); unregister_code(KC_LALT); break;
+  }
+  alttap_state.state = 0;
+}
+
 bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
 
   switch (keycode) {
@@ -454,6 +480,25 @@ bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
       return true;
   }
   return true;
+}
+
+// For custom functions
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+  switch (keycode) {
+    case TO_MINI:
+      if (!record->event.pressed) {
+          set_single_persistent_default_layer(BASE);
+      }
+      return false; // Skip all further processing of this key
+    case TO_60:
+      if (!record->event.pressed) {
+          set_single_persistent_default_layer(QWERTY);
+      }
+      return false; // Let QMK send the enter press/release events
+    default:
+      return true; // Process all other keycodes normally
+  }
 }
 
 
@@ -483,14 +528,17 @@ void matrix_scan_user(void) {
   if (old_layer != new_layer) {
     switch (new_layer) {
       case QWERTY:
+      case BASE:
           //rgblight_sethsv_noeeprom_azure();
           rgblight_sethsv_noeeprom (132, 102, rgblight_get_val());
         break;
       case SL:
+      case ARROWS:
           //rgblight_sethsv_noeeprom_coral();
           rgblight_sethsv_noeeprom (11, 176, rgblight_get_val());
         break;
       case ML:
+      case NUMBERS:
           //rgblight_sethsv_noeeprom_magenta();
           rgblight_sethsv_noeeprom (213, 255, rgblight_get_val());
         break;
