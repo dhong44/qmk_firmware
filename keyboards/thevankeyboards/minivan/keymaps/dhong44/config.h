@@ -1,0 +1,19 @@
+#pragma once
+
+// place overrides here
+#define RGB_DI_PIN D0
+#define RGBLED_NUM 3
+#define RGBLIGHT_CUSTOM_LED_INIT
+#define RGBLIGHT_SLEEP
+#define TAPPING_TERM 200
+#define RGBLIGHT_HUE_STEP 8
+#define RGBLIGHT_SAT_STEP 8
+#define RGBLIGHT_VAL_STEP 8
+#define BACKLIGHT_LEVELS 5
+#define BACKLIGHT_PIN B7
+
+#define MOUSEKEY_INTERVAL 16
+#define MOUSEKEY_DELAY 0
+#define MOUSEKEY_TIME_TO_MAX 60
+#define MOUSEKEY_MAX_SPEED 7
+#define MOUSEKEY_WHEEL_DELAY 0
