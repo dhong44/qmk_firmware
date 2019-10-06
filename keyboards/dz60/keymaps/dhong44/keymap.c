@@ -165,18 +165,18 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_TAB ,   KC_Q,      KC_W,      KC_E,      KC_R,      KC_T,      KC_Y,      KC_U,      KC_I,      KC_O,      KC_P,      KC_LBRC,   KC_RBRC,
         KC_BSPC,   KC_A,      KC_S,      KC_D,      KC_F,      KC_G,      KC_H,      KC_J,      KC_K,      KC_L,      KC_SCLN,   KC_QUOT,   KC_BSLS,   TO_MINI,
         KC_LSFT,   KC_Z,      KC_X,      KC_C,      KC_V,      KC_B,      KC_N,      KC_M,      KC_COMM,   KC_DOT,    KC_SLSH,   KC_RSFT,
-        KC_LCTL,   KC_LGUI,   TD(ALT_OSL1), KC_SPC, TD(MOD_BASE), KC_ENT, MO(FN),    KC_RALT,   KC_MENU,   KC_RCTL),
+        KC_LCTL,   KC_LGUI,   TD(ALT_MINI), LT(NUMBERS, KC_SPC), TD(MOD_BASE), LT(ARROWS, KC_ENT), MO(FN),    KC_RALT,   KC_MENU,   KC_RCTL),
 
   /* Keymap Secondary: Secondary Layer
    *
    * ,-----------------------------------------------------------.
    * |ESC|F1 |F2 |F3 |F4 |F5 |F6 |F7 |F8 |F9 |F10|F11|F12|ESC|BAK|
    * |-----------------------------------------------------------|
-   * |     | hm| u |end|pup|   |   |   |   |   |   |   |   |      |
+   * |     | hm| u |end|pup|   |   |   |   |   |   |   |   |     |
    * |------------------------------------------------------     |
    * |       | l | d | r |pdn|   |   | l | d | u | r |   |   |   |
    * |-----------------------------------------------------------|
-   * |         |   |   |   |   |   |   |    |   |   |   |         |
+   * |         |   |   |   |   |   |   |    |   |   |   |        |
    * |-----------------------------------------------------------|
    * |    |    |    |        |    |         |    |    |    |     |
    * `-----------------------------------------------------------'
@@ -273,8 +273,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
    [ARROWS] = LAYOUT_minivan(_______,
     //  1          2          3          4          5          6          7          8          9          10         11         12         13         14         15
-        KC_ESC,    KC_HOME,   KC_UP,     KC_END,    _______,   _______,   _______,   _______,   _______,   _______,   _______,   KC_RBRC,
-        KC_DELT,   KC_LEFT,   KC_DOWN,   KC_RIGHT,  _______,   _______,   KC_LEFT,   KC_DOWN,   KC_UP,     KC_RIGHT,  _______,   KC_GRAVE,
+        KC_ESC,    KC_HOME,   KC_UP,     KC_END,    KC_PGUP,   _______,   _______,   _______,   _______,   _______,   _______,   KC_RBRC,
+        KC_DELT,   KC_LEFT,   KC_DOWN,   KC_RIGHT,  KC_PGDN,   _______,   KC_LEFT,   KC_DOWN,   KC_UP,     KC_RIGHT,  _______,   KC_GRAVE,
         _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   KC_BSLS,   _______,
         _______,   _______,   _______,   KC_SPC,               _______,   _______,   _______,   TO(BASE)),
 
@@ -528,19 +528,25 @@ void matrix_scan_user(void) {
   if (old_layer != new_layer) {
     switch (new_layer) {
       case QWERTY:
+        rgblight_sethsv_noeeprom (132, 102, rgblight_get_val());
+        break;
       case BASE:
           //rgblight_sethsv_noeeprom_azure();
-          rgblight_sethsv_noeeprom (132, 102, rgblight_get_val());
+        rgblight_sethsv_noeeprom (132, 102, rgblight_get_val());
         break;
       case SL:
+        rgblight_sethsv_noeeprom (11, 176, rgblight_get_val());
+        break;
       case ARROWS:
           //rgblight_sethsv_noeeprom_coral();
-          rgblight_sethsv_noeeprom (11, 176, rgblight_get_val());
+        rgblight_sethsv_noeeprom (36, 255, rgblight_get_val());
         break;
       case ML:
+        rgblight_sethsv_noeeprom (11, 176, rgblight_get_val());
+        break;
       case NUMBERS:
           //rgblight_sethsv_noeeprom_magenta();
-          rgblight_sethsv_noeeprom (213, 255, rgblight_get_val());
+        rgblight_sethsv_noeeprom (106, 255, rgblight_get_val());
         break;
     }
 
