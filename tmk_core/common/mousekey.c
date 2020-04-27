@@ -134,10 +134,10 @@ static uint8_t wheel_unit(void) {
         unit = MOUSEKEY_WHEEL_MAX;
     } else if (mousekey_repeat == 0) {
         unit = MOUSEKEY_WHEEL_DELTA;
-    } else if (mousekey_repeat >= mk_wheel_time_to_max) {
+    } else if (mousekey_wheel_repeat >= mk_wheel_time_to_max) {
         unit = MOUSEKEY_WHEEL_DELTA * mk_wheel_max_speed;
     } else {
-        unit = (MOUSEKEY_WHEEL_DELTA * mk_wheel_max_speed * mousekey_repeat) / mk_wheel_time_to_max;
+        unit = (MOUSEKEY_WHEEL_DELTA * mk_wheel_max_speed * mousekey_wheel_repeat) / mk_wheel_time_to_max;
     }
     return (unit > MOUSEKEY_WHEEL_MAX ? MOUSEKEY_WHEEL_MAX : (unit == 0 ? 1 : unit));
 }
@@ -225,6 +225,7 @@ void mousekey_on(uint8_t code) {
         mousekey_accel |= (1 << 1);
     else if (code == KC_MS_ACCEL2)
         mousekey_accel |= (1 << 2);
+
 }
 
 void mousekey_off(uint8_t code) {
