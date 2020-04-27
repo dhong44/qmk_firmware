@@ -16,7 +16,8 @@ extern keymap_config_t keymap_config;
 #define NUMBERS 1
 #define ARROWS 2
 #define FN 3
-#define MOUSE 4
+#define FN2 3
+#define MOUSE 5
 
 typedef struct {
   bool is_press_action;
@@ -34,49 +35,57 @@ enum {
 
 //Tap dance enums
 enum {
-  ALT = 0,
+  GUI = 0,
 };
 
 int cur_dance (qk_tap_dance_state_t *state);
-void alt_finished (qk_tap_dance_state_t *state, void *user_data);
-void alt_reset (qk_tap_dance_state_t *state, void *user_data);
+void gui_finished (qk_tap_dance_state_t *state, void *user_data);
+void gui_reset (qk_tap_dance_state_t *state, void *user_data);
 
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [BASE] = LAYOUT(
     //  1          2          3          4          5          6          7          8          9          10         11         12         13         14         15
-        KC_TAB ,   KC_Q,      KC_W,      KC_E,      KC_R,      KC_T,      KC_Y,      KC_U,      KC_I,      KC_O,      KC_P,      KC_LBRC,
- CTL_T(KC_BSPC),   KC_A,      KC_S,      KC_D,      KC_F,      KC_G,      KC_H,      KC_J,      KC_K,      KC_L,      KC_SCLN,   KC_QUOT,
-        KC_LSFT,   KC_Z,      KC_X,      KC_C,      KC_V,      KC_B,      KC_N,      KC_M,      KC_COMM,   KC_DOT,    KC_SLSH,   KC_RSFT,
-        KC_LCTL,   KC_LGUI,   TD(ALT), LT(NUMBERS, KC_SPC),     LT(ARROWS, KC_ENT),  RCTL_T(KC_ESC), LT(FN, KC_TAB),      MO(MOUSE)),
+        XXXXXXX,   KC_Q,      KC_W,      KC_E,      KC_R,      KC_T,      KC_Y,      KC_U,      KC_I,      KC_O,      KC_P,      XXXXXXX,
+XXXXXXX,   LCTL_T(KC_A),      KC_S,      KC_D,      KC_F,      KC_G,      KC_H,      KC_J,      KC_K,      KC_L,      KC_SCLN,   XXXXXXX,
+XXXXXXX,   LSFT_T(KC_Z),      KC_X,      KC_C,      KC_V,      KC_B,      KC_N,      KC_M,      KC_COMM,   KC_DOT,    RSFT_T(KC_SLSH),   XXXXXXX,
+        XXXXXXX,   TD(GUI),   LALT_T(KC_BSPC), LT(NUMBERS, KC_SPC),     LT(ARROWS, KC_ENT),  RCTL_T(KC_ESC), LT(FN, KC_TAB),      XXXXXXX),
+
 
     [NUMBERS] = LAYOUT(
     //  1          2          3          4          5          6          7          8          9          10         11         12         13         14         15
-        KC_MINS,   KC_1,      KC_2,      KC_3,      KC_4,      KC_5,      KC_6,      KC_7,      KC_8,      KC_9,      KC_0,      KC_EQL,
-        _______,   KC_ZKHK,   _______,   _______,   _______,   _______,   KC_MINS,LSFT(KC_MINS),KC_EQL,    KC_PPLS,   KC_QUOT,   _______,
-        _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,
-        _______,   _______,   _______,   _______,              KC_ENT,    _______,   _______,   _______),
+        XXXXXXX,   KC_1,      KC_2,      KC_3,      KC_4,      KC_5,      KC_6,      KC_7,      KC_8,      KC_9,      KC_0,      XXXXXXX,
+XXXXXXX,   LCTL_T(KC_ZKHK),   _______,   _______,   _______,   _______,   KC_MINS,LSFT(KC_MINS),KC_EQL,    KC_PPLS,   KC_QUOT,   XXXXXXX,
+        XXXXXXX,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   XXXXXXX,
+        XXXXXXX,   _______,   _______,   _______,              KC_ENT,    _______,   _______,   _______),
 
     [ARROWS] = LAYOUT(
     //  1          2          3          4          5          6          7          8          9          10         11         12         13         14         15
-        KC_ZKHK,   KC_HOME,   KC_UP,     KC_END,    KC_PGUP,   _______,   _______,   _______,   _______,   KC_LBRC,   KC_RBRC,   KC_RBRC,
-  CTL_T(KC_DEL),   KC_LEFT,   KC_DOWN,   KC_RIGHT,  KC_PGDN,   _______,   KC_LEFT,   KC_DOWN,   KC_UP,     KC_RIGHT,  KC_BSLS,   KC_BSLS,
-        _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   KC_NO,     _______,
-        _______,   _______,   _______,   KC_SPC,               _______,   _______,   _______,   _______),
+        XXXXXXX,   KC_HOME,   KC_UP,     KC_END,    KC_PGUP,   _______,   _______,   _______,   _______,   KC_LBRC,   KC_RBRC,   XXXXXXX,
+XXXXXXX,   LCTL_T(KC_LEFT),   KC_DOWN,   KC_RIGHT,  KC_PGDN,   _______,   KC_LEFT,   KC_DOWN,   KC_UP,     KC_RIGHT,  KC_BSLS,   XXXXXXX,
+        XXXXXXX,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,     XXXXXXX,
+        XXXXXXX,   _______,   _______,   KC_SPC,               _______,   _______,   _______,   _______),
 
     [FN] = LAYOUT(
     //  1          2          3          4          5          6          7          8          9          10         11         12         13         14         15
-        KC_F11,    KC_F1,     KC_F2,     KC_F3,     KC_F4,     KC_F5,     KC_F6,     KC_F7,     KC_F8,     KC_F9,     KC_F10,    KC_F12,
-        _______,   KC_MUTE,   KC_VOLD,   KC_VOLU,   _______,   _______,   _______,   _______,   _______,   RGB_VAD,   RGB_VAI,   _______,
-        _______,   KC_MPRV,   KC_MPLY,   KC_MNXT,   _______,   _______,   _______,   _______,   _______,   KC_BRID,   KC_BRIU,   _______,
-        _______,   _______,   _______,   _______,              _______,   _______,   _______,   _______),
+        XXXXXXX,    KC_F1,     KC_F2,     KC_F3,     KC_F4,     KC_F5,     KC_F6,     KC_F7,     KC_F8,     KC_F9,     KC_F10,   XXXXXXX,
+        XXXXXXX,   KC_MUTE,   KC_VOLD,   KC_VOLU,   _______,   _______,   _______,   _______,   _______,   RGB_VAD,   RGB_VAI,   XXXXXXX,
+        XXXXXXX,   KC_MPRV,   KC_MPLY,   KC_MNXT,   KC_F11,    _______,   _______,   KC_F12,    _______,   KC_BRID,   KC_BRIU,   XXXXXXX,
+        XXXXXXX,   _______,   _______,   _______,              _______,   _______,   _______,   _______),
+
+    [FN2] = LAYOUT(
+    //  1          2          3          4          5          6          7          8          9          10         11         12         13         14         15
+        XXXXXXX,    KC_F1,     KC_F2,     KC_F3,  LALT(KC_F4),     KC_F5,     KC_F6,     KC_F7,     KC_F8,     KC_F9,     KC_F10,   XXXXXXX,
+        XXXXXXX,   KC_MUTE,   KC_VOLD,   KC_VOLU,   _______,   _______,   _______,   _______,   _______,   RGB_VAD,   RGB_VAI,   XXXXXXX,
+        XXXXXXX,   KC_MPRV,   KC_MPLY,   KC_MNXT,   KC_F11,    _______,   _______,   KC_F12,    _______,   KC_BRID,   KC_BRIU,   XXXXXXX,
+        XXXXXXX,   _______,   _______,   _______,              _______,   _______,   _______,   _______),
 
     [MOUSE] = LAYOUT(
     //  1          2          3          4          5          6          7          8          9          10         11         12         13         14         15
-        _______,   KC_BTN1,   KC_MS_U,   KC_BTN2,   KC_WH_U,   _______,   _______,   _______,   _______,   _______,   _______,   _______,
-        _______,   KC_MS_L,   KC_MS_D,   KC_MS_R,   KC_WH_D,   _______,   _______,   _______,   _______,   _______,   _______,   _______,
-        _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,
-        _______,   _______,   _______,   KC_BTN1,              KC_BTN2,   _______,   _______,   _______)
+        XXXXXXX,   KC_BTN1,   KC_MS_U,   KC_BTN2,   KC_WH_U,   _______,   _______,   _______,   _______,   _______,   _______,   XXXXXXX,
+        XXXXXXX,   KC_MS_L,   KC_MS_D,   KC_MS_R,   KC_WH_D,   _______,   _______,   _______,   _______,   _______,   _______,   XXXXXXX,
+        XXXXXXX,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   XXXXXXX,
+        XXXXXXX,   _______,   _______,   KC_BTN1,              KC_BTN2,   _______,   _______,   _______)
 };
 
 //   _____            ___
@@ -108,7 +117,7 @@ static tap alttap_state = {
 };
 
 qk_tap_dance_action_t tap_dance_actions[] = {
-  [ALT]        = ACTION_TAP_DANCE_FN_ADVANCED(NULL,alt_finished, alt_reset),
+  [GUI]        = ACTION_TAP_DANCE_FN_ADVANCED(NULL,gui_finished, gui_reset),
 };
 
 //     _   _  _____    ___  ___ _      ___ _   _ _  _  ___ _____ ___ ___  _  _   _    ___   ___ ___ ___
@@ -117,25 +126,25 @@ qk_tap_dance_action_t tap_dance_actions[] = {
 //  /_/ \_\____|_|    \___/|___/____| |_|  \___/|_|\_|\___| |_| |___\___/|_|\_| |____\___/ \___|___\___|
 
 
-void alt_finished (qk_tap_dance_state_t *state, void *user_data) {
+void gui_finished (qk_tap_dance_state_t *state, void *user_data) {
   alttap_state.state = cur_dance(state);
   switch (alttap_state.state) {
-    case SINGLE_TAP: set_oneshot_layer(FN, ONESHOT_START); clear_oneshot_layer_state(ONESHOT_PRESSED); break;
-    case SINGLE_HOLD: register_code(KC_LALT); break;
-    case DOUBLE_TAP: register_code(KC_LALT); break;
-    case DOUBLE_HOLD: register_code(KC_LALT); layer_on(FN); break;
+    case SINGLE_TAP: set_oneshot_layer(FN2, ONESHOT_START); clear_oneshot_layer_state(ONESHOT_PRESSED); break;
+    case SINGLE_HOLD: register_code(KC_LGUI); break;
+    case DOUBLE_TAP: register_code(KC_LGUI); break;
+    case DOUBLE_HOLD: register_code(KC_LGUI); break;
     //Last case is for fast typing. Assuming your key is `f`:
     //For example, when typing the word `buffer`, and you want to make sure that you send `ff` and not `Esc`.
     //In order to type `ff` when typing fast, the next character will have to be hit within the `TAPPING_TERM`, which by default is 200ms.
   }
 }
 
-void alt_reset (qk_tap_dance_state_t *state, void *user_data) {
+void gui_reset (qk_tap_dance_state_t *state, void *user_data) {
   switch (alttap_state.state) {
     case SINGLE_TAP: break;
-    case SINGLE_HOLD: unregister_code(KC_LALT); break;
-    case DOUBLE_TAP: unregister_code(KC_LALT); break;
-    case DOUBLE_HOLD: layer_off(FN); unregister_code(KC_LALT); break;
+    case SINGLE_HOLD: unregister_code(KC_LGUI); break;
+    case DOUBLE_TAP: unregister_code(KC_LGUI); break;
+    case DOUBLE_HOLD:  unregister_code(KC_LGUI); break;
   }
   alttap_state.state = 0;
 }
