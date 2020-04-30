@@ -2,7 +2,11 @@
 #include QMK_KEYBOARD_H
 
 #ifdef RGBLIGHT_ENABLE
-#include "rgblight.h"
+  #include "rgblight.h"
+#endif
+
+#ifdef POINTING_DEVICE_ENABLE
+  #include "pointing_device.h"
 #endif
 
 extern keymap_config_t keymap_config;
@@ -17,6 +21,7 @@ extern keymap_config_t keymap_config;
 #define ARROWS 2
 #define FN 3
 #define SPECIAL 4
+#define MOUSE 5
 
 typedef struct {
   bool is_press_action;
@@ -32,6 +37,11 @@ enum {
   TRIPLE_HOLD = 6
 };
 
+enum {
+  SCROLLU = SAFE_RANGE,
+  SCROLLD
+};
+
 //Tap dance enums
 enum {
   GUI = 0,
@@ -45,7 +55,7 @@ void gui_reset (qk_tap_dance_state_t *state, void *user_data);
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [BASE] = LAYOUT(
     //  1          2          3          4          5          6          7          8          9          10         11         12         13         14         15
-        XXXXXXX,   KC_Q,      KC_W,      KC_E,      KC_R,      KC_T,      KC_Y,      KC_U,      KC_I,      KC_O,      KC_P,      XXXXXXX,
+        XXXXXXX,   KC_Q,      KC_W,      KC_E,      KC_R,      KC_T,      KC_Y,      KC_U,      KC_I, LT(MOUSE,KC_O), KC_P,      XXXXXXX,
 XXXXXXX,   LCTL_T(KC_A),      KC_S,      KC_D,      KC_F,      KC_G,      KC_H,      KC_J,      KC_K,      KC_L,      RGUI_T(KC_SCLN),   XXXXXXX,
 XXXXXXX,   LSFT_T(KC_Z),      KC_X,      KC_C,      KC_V,      KC_B,      KC_N,      KC_M,      KC_COMM,   KC_DOT,    RSFT_T(KC_SLSH),   XXXXXXX,
         XXXXXXX,   TD(GUI),   LALT_T(KC_BSPC), LT(NUMBERS, KC_SPC),     LT(ARROWS, KC_ENT),  RCTL_T(KC_ESC), LT(FN, KC_TAB),      XXXXXXX),
@@ -63,7 +73,7 @@ XXXXXXX,   LCTL_T(KC_ZKHK),   _______,   _______,   _______,   _______,   KC_MIN
         XXXXXXX,   KC_HOME,   KC_UP,     KC_END,    KC_PGUP,   _______,   _______,   _______,   _______,   KC_LBRC,   KC_RBRC,   XXXXXXX,
 XXXXXXX,   LCTL_T(KC_LEFT),   KC_DOWN,   KC_RIGHT,  KC_PGDN,   _______,   KC_LEFT,   KC_DOWN,   KC_UP,     KC_RIGHT,  RGUI_T(KC_BSLS),   XXXXXXX,
         XXXXXXX,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,     XXXXXXX,
-        XXXXXXX,   _______,   _______,   KC_SPC,               _______,   _______,   _______,   _______),
+        XXXXXXX,   _______,   LALT_T(KC_DEL),   KC_SPC,               _______,   _______,   _______,   _______),
 
     [FN] = LAYOUT(
     //  1          2          3          4          5          6          7          8          9          10         11         12         13         14         15
@@ -77,7 +87,14 @@ XXXXXXX,   LCTL_T(KC_LEFT),   KC_DOWN,   KC_RIGHT,  KC_PGDN,   _______,   KC_LEF
         XXXXXXX,   KC_TAB,    KC_F2,     KC_F3,     KC_F4,     KC_F5,     KC_F6,     KC_F7,     KC_F8,     KC_F9,     KC_F10,    XXXXXXX,
         XXXXXXX,   KC_MUTE,   KC_VOLD,   KC_VOLU,   KC_F11,    _______,   _______,   KC_F12,    _______,   RGB_VAD,   RGB_VAI,   XXXXXXX,
 XXXXXXX,   LSFT_T(KC_MPRV),   KC_MPLY,   KC_MNXT,   KC_CLCK,   _______,   _______,   _______,   _______,   KC_BRID,   KC_BRIU,   XXXXXXX,
-        XXXXXXX,   _______,   _______,   _______,              _______,   _______,   _______,   _______)
+        XXXXXXX,   _______,   _______,   _______,              _______,   _______,   _______,   _______),
+
+    [MOUSE] = LAYOUT(
+    //  1          2          3          4          5          6          7          8          9          10         11         12         13         14         15
+        _______,   _______,   KC_BTN1,   KC_MS_U,   KC_BTN2,   KC_WH_U,   _______,   _______,   _______,   _______,   _______,   _______,
+        _______,   _______,   KC_MS_L,   KC_MS_D,   KC_MS_R,   KC_WH_D,   _______,   KC_WH_D,   KC_WH_U,   _______,   _______,   _______,
+        _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,
+        _______,   _______,   _______,   KC_BTN1,              KC_BTN2,   _______,   _______,   _______)
 };
 
 //   _____            ___
@@ -156,7 +173,7 @@ bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
       return true;
     case RESET:
       /* Don't allow reset from oneshot layer state */
-      if (record->event.pressed && is_oneshot_layer_active()){
+      if (record->event.pressed && is_oneshot_layer_active()) {
         clear_oneshot_layer_state(ONESHOT_OTHER_KEY_PRESSED);
         return false;
       }
@@ -165,6 +182,23 @@ bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
       return true;
   }
   return true;
+}
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+  switch(keycode) {
+      case SCROLLU:
+      case SCROLLD: ;
+        report_mouse_t currentReport = pointing_device_get_report();
+        if (record->event.pressed) {
+          currentReport.v = (keycode == SCROLLU) ? 1 : -1;
+        }
+        pointing_device_set_report(currentReport);
+        pointing_device_send();
+        return true;
+      default:
+        return true;
+  }
+
 }
 
 void persistent_default_layer_set(uint16_t default_layer) {
