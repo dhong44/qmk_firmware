@@ -186,6 +186,14 @@ void mousekey_on(uint8_t code) {
         mousekey_accel |= (1 << 1);
     else if (code == KC_MS_ACCEL2)
         mousekey_accel |= (1 << 2);
+
+    if (code == KC_MS_WH_UP || code == KC_MS_WH_DOWN || code == KC_MS_WH_LEFT || KC_MS_WH_RIGHT) {
+        last_timer_w = timer_read();
+    }
+
+    if (code == KC_MS_UP || code == KC_MS_DOWN || code == KC_MS_LEFT || KC_MS_RIGHT) {
+        last_timer_c = timer_read();
+    }
 }
 
 void mousekey_off(uint8_t code) {
