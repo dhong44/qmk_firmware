@@ -38,8 +38,7 @@ enum {
 };
 
 enum {
-  SCROLLU = SAFE_RANGE,
-  SCROLLD
+  MOUBTN1 = SAFE_RANGE
 };
 
 //Tap dance enums
@@ -91,8 +90,8 @@ XXXXXXX,   LSFT_T(KC_MPRV),   KC_MPLY,   KC_MNXT,   KC_CLCK,   _______,   ______
 
     [MOUSE] = LAYOUT(
     //  1          2          3          4          5          6          7          8          9          10         11         12         13         14         15
-        _______,   _______,   KC_BTN1,   KC_MS_U,   KC_BTN2,   KC_WH_U,   _______,   _______,   _______,   _______,   _______,   _______,
-        _______,   _______,   KC_MS_L,   KC_MS_D,   KC_MS_R,   KC_WH_D,   _______,   KC_WH_D,   KC_WH_U,   _______,   _______,   _______,
+        _______,   _______,   KC_BTN1,   KC_MS_U,   KC_BTN2,   KC_PGUP,   _______,   _______,   _______,   _______,   _______,   _______,
+        _______,   _______,   KC_MS_L,   KC_MS_D,   KC_MS_R,   KC_PGDN,   KC_WH_L,   KC_WH_D,   KC_WH_U,   KC_WH_R,   _______,   _______,
         _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,
         _______,   _______,   _______,   KC_BTN1,              KC_BTN2,   _______,   _______,   _______)
 };
@@ -184,22 +183,23 @@ bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
   return true;
 }
 
-bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-  switch(keycode) {
-      case SCROLLU:
-      case SCROLLD: ;
-        report_mouse_t currentReport = pointing_device_get_report();
-        if (record->event.pressed) {
-          currentReport.v = (keycode == SCROLLU) ? 1 : -1;
-        }
-        pointing_device_set_report(currentReport);
-        pointing_device_send();
-        return true;
-      default:
-        return true;
-  }
+// bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+//   switch(keycode) {
+//       case MOUBTN1: ;
+//         report_mouse_t currentReport = pointing_device_get_report();
+//         if (record->event.pressed) {
+//           currentReport.buttons |= MOUSE_BTN1; //this is defined in report.h
+//         } else {
+//           currentReport.buttons &= ~MOUSE_BTN1;
+//         }
+//         pointing_device_set_report(currentReport);
+//         pointing_device_send();
+//         return true;
+//       default:
+//         return true;
+//   }
 
-}
+// }
 
 void persistent_default_layer_set(uint16_t default_layer) {
   eeconfig_update_default_layer(default_layer);
