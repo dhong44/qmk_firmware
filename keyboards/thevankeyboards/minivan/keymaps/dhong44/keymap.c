@@ -20,13 +20,24 @@ extern keymap_config_t keymap_config;
 #define MACINTOSH 1
 #define NUMBERS 2
 #define ARROWS 3
-#define FN 5
-#define MOUSE 6
+
+#define MINIWINDOWS 7
+#define MINIMACINTOSH 8
+#define MININUMBERS 9
+#define MINIARROWS 10
+#define MINIFN 11
+#define MINIMOUSE 12
+
+#define FN 14
+#define MOUSE 15
 
 typedef struct {
   bool is_press_action;
   int state;
 } tap;
+
+static uint8_t hue;
+static uint8_t sat;
 
 enum {
   SINGLE_TAP = 1,
@@ -49,52 +60,78 @@ enum {
 //Tap dance enums
 enum {
   ALT = 0,
-  CMD = 1,
-  MINIALT = 2,
-  MINIWIN = 3
+  GUI = 1,
 };
 
 int cur_dance (qk_tap_dance_state_t *state);
 void alt_finished (qk_tap_dance_state_t *state, void *user_data);
 void alt_reset (qk_tap_dance_state_t *state, void *user_data);
-void cmd_finished (qk_tap_dance_state_t *state, void *user_data);
-void cmd_reset (qk_tap_dance_state_t *state, void *user_data);
+void gui_finished (qk_tap_dance_state_t *state, void *user_data);
+void gui_reset (qk_tap_dance_state_t *state, void *user_data);
 
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [WINDOWS] = LAYOUT(
     //  1          2          3          4          5          6          7          8          9          10         11         12         13         14         15
-        KC_TAB ,   KC_Q,      KC_W,      KC_E,      KC_R,      KC_T,      KC_Y,      KC_U,      KC_I, LT(MOUSE,KC_O), KC_P,      TO_MINIWIN,
-        KC_BSPC,   KC_A,      KC_S,      KC_D,      KC_F,      KC_G,      KC_H,      KC_J,      KC_K,      KC_L,      KC_SCLN,   KC_QUOT,
-        KC_LSFT,   KC_Z,      KC_X,      KC_C,      KC_V,      KC_B,      KC_N,      KC_M,      KC_COMM,   KC_DOT,    KC_SLSH,   KC_RSFT,
-        KC_LCTL,   KC_LWIN,   TD(ALT), LT(NUMBERS, KC_SPC),     LT(ARROWS, KC_ENT),  RCTL_T(KC_ESC), LT(FN, KC_DEL),  TO_MAC),
+        KC_TAB ,   KC_Q,      KC_W,      KC_E,      KC_R,      KC_T,      KC_Y,      KC_U,      KC_I, LT(MOUSE,KC_O), RALT_T(KC_P),      TO_MINIWIN,
+LCTL_T(KC_BSPC),   LCTL_T(KC_A),      KC_S,      KC_D,      KC_F,      KC_G,      KC_H,      KC_J,      KC_K,      KC_L,      RCTL_T(KC_SCLN),   KC_QUOT,
+        KC_LSFT,   LSFT_T(KC_Z),      KC_X,      KC_C,      KC_V,      KC_B,      KC_N,      KC_M,      KC_COMM,   KC_DOT,    RSFT_T(KC_SLSH),   KC_RSFT,
+        KC_LCTL,   TD(GUI),   LALT_T(KC_BSPC), LT(NUMBERS, KC_SPC),     LT(ARROWS, KC_ENT),  RGUI_T(KC_TAB), LT(FN, KC_ESC),  TO_MAC),
 
     [MACINTOSH] = LAYOUT(
     //  1          2          3          4          5          6          7          8          9          10         11         12         13         14         15
-        _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   TO_MINIMAC,
-        _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,
-        _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,
-        _______,   KC_LOPT,   TD(CMD),   _______,              _______,   RCMD_T(KC_ESC),   _______,   TO_WIN),
+        KC_TAB ,   KC_Q,      KC_W,      KC_E,      KC_R,      KC_T,      KC_Y,      KC_U,      KC_I, LT(MOUSE,KC_O), RALT_T(KC_P),      TO_MINIMAC,
+LCTL_T(KC_BSPC),   LCTL_T(KC_A),      KC_S,      KC_D,      KC_F,      KC_G,      KC_H,      KC_J,      KC_K,      KC_L,      RCTL_T(KC_SCLN),   KC_QUOT,
+        KC_LSFT,   LSFT_T(KC_Z),      KC_X,      KC_C,      KC_V,      KC_B,      KC_N,      KC_M,      KC_COMM,   KC_DOT,    RSFT_T(KC_SLSH),   KC_RSFT,
+        KC_LCTL,   TD(ALT),   LGUI_T(KC_BSPC), LT(NUMBERS, KC_SPC),     LT(ARROWS, KC_ENT),  RGUI_T(KC_TAB), LT(FN, KC_ESC),  TO_WIN),
 
     [NUMBERS] = LAYOUT(
     //  1          2          3          4          5          6          7          8          9          10         11         12         13         14         15
-        KC_ZKHK,   KC_1,      KC_2,      KC_3,      KC_4,      KC_5,      KC_6,      KC_7,      KC_8,      KC_9,      KC_0,      KC_EQL,
-        _______,   _______,   _______,   _______,   _______,   _______,   KC_MINS,LSFT(KC_MINS),KC_EQL,    KC_PPLS,   _______,   _______,
+        KC_ZKHK,   KC_1,      KC_2,      KC_3,      KC_4,      KC_5,      KC_6,      KC_7,      KC_8,      KC_9,      RALT_T(KC_0),      KC_EQL,
+        _______,   LCTL_T(KC_ZKHK),   _______,   _______,   _______,   _______,   KC_MINS,LSFT(KC_MINS),KC_EQL,    KC_PPLS,   RCTL_T(KC_QUOT),   _______,
         _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,
         _______,   _______,   _______,   _______,              KC_ENT,    _______,   _______,   _______),
 
     [ARROWS] = LAYOUT(
     //  1          2          3          4          5          6          7          8          9          10         11         12         13         14         15
-        KC_ZKHK,   KC_HOME,   KC_UP,     KC_END,    KC_PGUP,   _______,   _______,   _______,   _______,   _______,   _______,   KC_RBRC,
-        KC_DELT,   KC_LEFT,   KC_DOWN,   KC_RIGHT,  KC_PGDN,   _______,   KC_LEFT,   KC_DOWN,   KC_UP,     KC_RIGHT,  _______,   KC_BSLS,
+        KC_ZKHK,   KC_HOME,   KC_UP,     KC_END,    KC_PGUP,   _______,   _______,   _______,   _______,   KC_LBRC,   RALT_T(KC_RBRC),   KC_RBRC,
+LCTL_T(KC_DELT),   LCTL_T(KC_LEFT),   KC_DOWN,   KC_RIGHT,  KC_PGDN,   _______,   KC_LEFT,   KC_DOWN,   KC_UP,     KC_RIGHT,  RCTL_T(KC_BSLS),   KC_BSLS,
         _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   KC_NO,     _______,
         _______,   _______,   _______,   KC_SPC,               _______,   _______,   _______,   _______),
 
+    [MINIWINDOWS] = LAYOUT(
+    //  1          2          3          4          5          6          7          8          9          10         11         12         13         14         15
+        XXXXXXX,   KC_Q,      KC_W,      KC_E,      KC_R,      KC_T,      KC_Y,      KC_U,      KC_I, LT(MOUSE,KC_O), RALT_T(KC_P),      TO_WIN,
+XXXXXXX,   LCTL_T(KC_A),      KC_S,      KC_D,      KC_F,      KC_G,      KC_H,      KC_J,      KC_K,      KC_L,      RCTL_T(KC_SCLN),   XXXXXXX,
+XXXXXXX,   LSFT_T(KC_Z),      KC_X,      KC_C,      KC_V,      KC_B,      KC_N,      KC_M,      KC_COMM,   KC_DOT,    RSFT_T(KC_SLSH),   XXXXXXX,
+        XXXXXXX,   TD(GUI),   LALT_T(KC_BSPC), LT(MININUMBERS, KC_SPC),   LT(MINIARROWS, KC_ENT),  RCTL_T(KC_TAB), LT(FN, KC_ESC),      TO_MINIMAC),
+
+    [MINIMACINTOSH] = LAYOUT(
+    //  1          2          3          4          5          6          7          8          9          10         11         12         13         14         15
+        XXXXXXX,   KC_Q,      KC_W,      KC_E,      KC_R,      KC_T,      KC_Y,      KC_U,      KC_I, LT(MOUSE,KC_O), RALT_T(KC_P),      TO_MAC,
+XXXXXXX,   LCTL_T(KC_A),      KC_S,      KC_D,      KC_F,      KC_G,      KC_H,      KC_J,      KC_K,      KC_L,      RCTL_T(KC_SCLN),   XXXXXXX,
+XXXXXXX,   LSFT_T(KC_Z),      KC_X,      KC_C,      KC_V,      KC_B,      KC_N,      KC_M,      KC_COMM,   KC_DOT,    RSFT_T(KC_SLSH),   XXXXXXX,
+        XXXXXXX,   TD(ALT),   LCMD_T(KC_BSPC), LT(MININUMBERS, KC_SPC),   LT(MINIARROWS, KC_ENT),  RCMD_T(KC_TAB), LT(FN, KC_ESC),      TO_MINIWIN),
+
+    [MININUMBERS] = LAYOUT(
+    //  1          2          3          4          5          6          7          8          9          10         11         12         13         14         15
+        XXXXXXX,   KC_1,      KC_2,      KC_3,      KC_4,      KC_5,      KC_6,      KC_7,      KC_8,      KC_9,      RALT_T(KC_0),      XXXXXXX,
+XXXXXXX,   LCTL_T(KC_ZKHK),   _______,   _______,   _______,   _______,   KC_MINS,LSFT(KC_MINS),KC_EQL,    KC_PPLS,   RCTL_T(KC_QUOT),   XXXXXXX,
+        XXXXXXX,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   XXXXXXX,
+        XXXXXXX,   _______,   _______,   _______,              KC_ENT,    _______,   _______,   _______),
+
+    [MINIARROWS] = LAYOUT(
+    //  1          2          3          4          5          6          7          8          9          10         11         12         13         14         15
+        XXXXXXX,   KC_HOME,   KC_UP,     KC_END,    KC_PGUP,   _______,   _______,   _______,   _______,   KC_LBRC,   RALT_T(KC_RBRC),   XXXXXXX,
+XXXXXXX,   LCTL_T(KC_LEFT),   KC_DOWN,   KC_RIGHT,  KC_PGDN,   _______,   KC_LEFT,   KC_DOWN,   KC_UP,     KC_RIGHT,  RCTL_T(KC_BSLS),   XXXXXXX,
+        XXXXXXX,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,     XXXXXXX,
+        XXXXXXX,   _______,   LALT_T(KC_DEL),   KC_SPC,               _______,   _______,   _______,   _______),
+
     [FN] = LAYOUT(
     //  1          2          3          4          5          6          7          8          9          10         11         12         13         14         15
-        KC_F11,    KC_F1,     KC_F2,     KC_F3,     KC_F4,     KC_F5,     KC_F6,     KC_F7,     KC_F8,     KC_F9,     KC_F10,    KC_F12,
+        _______,   KC_F1,     KC_F2,     KC_F3,     KC_F4,     KC_F5,     KC_F6,     KC_F7,     KC_F8,     KC_F9,     KC_F10,    _______,
         _______,   KC_MUTE,   KC_VOLD,   KC_VOLU,   KC_F11,    _______,   _______,   KC_F12,    _______,   RGB_VAD,   RGB_VAI,   _______,
-        _______,   KC_MPRV,   KC_MPLY,   KC_MNXT,   _______,   _______,   _______,   _______,   _______,   KC_BRID,   KC_BRIU,   _______,
+        _______,   KC_MPRV,   KC_MPLY,   KC_MNXT,   KC_CLCK,   _______,   _______,   _______,   _______,   KC_BRID,   KC_BRIU,   _______,
         _______,   _______,   _______,   _______,              _______,   _______,   _______,   _______),
 
     [MOUSE] = LAYOUT(
@@ -102,7 +139,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         _______,   _______,   KC_BTN1,   KC_MS_U,   KC_BTN2,   KC_PGUP,   _______,   _______,   _______,   _______,   _______,   _______,
         _______,   _______,   KC_MS_L,   KC_MS_D,   KC_MS_R,   KC_PGDN,   KC_WH_L,   KC_WH_D,   KC_WH_U,   KC_WH_R,   _______,   _______,
         _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,
-        _______,   _______,   _______,   KC_BTN1,              KC_BTN2,   _______,   _______,   _______)
+        _______,   _______,   _______,   KC_BTN1,              KC_BTN2,   _______,   _______,   _______),
+
 };
 
 //   _____            ___
@@ -135,7 +173,7 @@ static tap alttap_state = {
 
 qk_tap_dance_action_t tap_dance_actions[] = {
   [ALT]        = ACTION_TAP_DANCE_FN_ADVANCED(NULL,alt_finished, alt_reset),
-  [CMD]        = ACTION_TAP_DANCE_FN_ADVANCED(NULL,cmd_finished, cmd_reset),
+  [GUI]        = ACTION_TAP_DANCE_FN_ADVANCED(NULL,gui_finished, gui_reset),
 };
 
 //     _   _  _____    ___  ___ _      ___ _   _ _  _  ___ _____ ___ ___  _  _   _    ___   ___ ___ ___
@@ -167,25 +205,25 @@ void alt_reset (qk_tap_dance_state_t *state, void *user_data) {
   alttap_state.state = 0;
 }
 
-void cmd_finished (qk_tap_dance_state_t *state, void *user_data) {
+void gui_finished (qk_tap_dance_state_t *state, void *user_data) {
   alttap_state.state = cur_dance(state);
   switch (alttap_state.state) {
     case SINGLE_TAP: set_oneshot_layer(FN, ONESHOT_START); clear_oneshot_layer_state(ONESHOT_PRESSED); break;
-    case SINGLE_HOLD: register_code(KC_LCMD); break;
-    case DOUBLE_TAP: register_code(KC_LCMD); break;
-    case DOUBLE_HOLD: register_code(KC_LCMD); layer_on(FN); break;
+    case SINGLE_HOLD: register_code(KC_LGUI); break;
+    case DOUBLE_TAP: register_code(KC_LGUI); break;
+    case DOUBLE_HOLD: register_code(KC_LGUI); layer_on(FN); break;
     //Last case is for fast typing. Assuming your key is `f`:
     //For example, when typing the word `buffer`, and you want to make sure that you send `ff` and not `Esc`.
     //In order to type `ff` when typing fast, the next character will have to be hit within the `TAPPING_TERM`, which by default is 200ms.
   }
 }
 
-void cmd_reset (qk_tap_dance_state_t *state, void *user_data) {
+void gui_reset (qk_tap_dance_state_t *state, void *user_data) {
   switch (alttap_state.state) {
     case SINGLE_TAP: break;
-    case SINGLE_HOLD: unregister_code(KC_LCMD); break;
-    case DOUBLE_TAP: unregister_code(KC_LCMD); break;
-    case DOUBLE_HOLD: layer_off(FN); unregister_code(KC_LCMD); break;
+    case SINGLE_HOLD: unregister_code(KC_LGUI); break;
+    case DOUBLE_TAP: unregister_code(KC_LGUI); break;
+    case DOUBLE_HOLD: layer_off(FN); unregister_code(KC_LGUI); break;
   }
   alttap_state.state = 0;
 }
@@ -217,15 +255,34 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     case TO_MAC:
       if (!record->event.pressed) {
         set_single_persistent_default_layer(MACINTOSH);
+        hue = 62;
+        sat = 255;
+        rgblight_sethsv_noeeprom (hue, sat, rgblight_get_val());
       }
       return false;
     case TO_WIN:
       if (!record->event.pressed) {
         set_single_persistent_default_layer(WINDOWS);
+        hue = 132;
+        sat = 102;
+        rgblight_sethsv_noeeprom (hue, sat, rgblight_get_val());
       }
       return false;
     case TO_MINIMAC:
+      if (!record->event.pressed) {
+        set_single_persistent_default_layer(MINIMACINTOSH);
+        hue = 85;
+        sat = 255;
+        rgblight_sethsv_noeeprom (hue, sat, rgblight_get_val());
+      }
+      return false;
     case TO_MINIWIN:
+      if (!record->event.pressed) { 
+        set_single_persistent_default_layer(MINIWINDOWS);
+        hue = 170;
+        sat = 255;
+        rgblight_sethsv_noeeprom (hue, sat, rgblight_get_val());
+      }
       return false;
     default:
       return true;
@@ -238,7 +295,31 @@ void persistent_default_layer_set(uint16_t default_layer) {
 }
 
 void matrix_init_user(void) {
-    rgblight_enable();
+  rgblight_enable();
+  switch (eeconfig_read_default_layer()) {
+      case WINDOWS:
+        //rgblight_sethsv_noeeprom_azure();
+        // rgblight_sethsv_noeeprom (132, 102, rgblight_get_val());
+        hue = 132;
+        sat = 102;
+        break;
+      case MINIWINDOWS:
+        //rgblight_sethsv_noeeprom_blue();
+        // rgblight_sethsv_noeeprom (170, 255, rgblight_get_val());
+        hue = 170;
+        sat = 255;
+        break;
+      case MACINTOSH:
+        // rgblight_sethsv_noeeprom (85, 255, rgblight_get_val());
+        hue = 106;
+        sat = 255;
+        break;
+      case MINIMACINTOSH:
+        // rgblight_sethsv_noeeprom (106, 255, rgblight_get_val());
+        hue = 85;
+        sat = 255;
+        break;
+  }
 }
 
 void matrix_scan_user(void) {
@@ -250,17 +331,20 @@ void matrix_scan_user(void) {
   if (old_layer != new_layer) {
     switch (new_layer) {
       case WINDOWS:
+      case MINIWINDOWS:
       case MACINTOSH:
-          //rgblight_sethsv_noeeprom_azure();
-          rgblight_sethsv_noeeprom (132, 102, rgblight_get_val());
+      case MINIMACINTOSH:
+        rgblight_sethsv_noeeprom (hue, sat, rgblight_get_val());
         break;
       case ARROWS:
-          //rgblight_sethsv_noeeprom_coral();
-          rgblight_sethsv_noeeprom (11, 176, rgblight_get_val());
+      case MINIARROWS:
+        //rgblight_sethsv_noeeprom_coral();
+        rgblight_sethsv_noeeprom (11, 176, rgblight_get_val());
         break;
       case NUMBERS:
-          //rgblight_sethsv_noeeprom_magenta();
-          rgblight_sethsv_noeeprom (213, 255, rgblight_get_val());
+      case MININUMBERS:
+        //rgblight_sethsv_noeeprom_magenta();
+        rgblight_sethsv_noeeprom (213, 255, rgblight_get_val());
         break;
     }
 
