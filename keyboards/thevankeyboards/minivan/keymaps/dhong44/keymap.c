@@ -16,11 +16,12 @@ extern keymap_config_t keymap_config;
 // Layer names don't all need to be of the same length, obviously, and you can also skip them
 // entirely and just use numbers.
 
-#define BASE 0
-#define NUMBERS 1
-#define ARROWS 2
-#define FN 3
-#define MOUSE 4
+#define WINDOWS 0
+#define MACINTOSH 1
+#define NUMBERS 2
+#define ARROWS 3
+#define FN 5
+#define MOUSE 6
 
 typedef struct {
   bool is_press_action;
@@ -36,28 +37,49 @@ enum {
   TRIPLE_HOLD = 6
 };
 
+// Custom Layer Switching
+
+enum {
+  TO_MAC = SAFE_RANGE,
+  TO_WIN,
+  TO_MINIMAC,
+  TO_MINIWIN
+};
+
 //Tap dance enums
 enum {
   ALT = 0,
+  CMD = 1,
+  MINIALT = 2,
+  MINIWIN = 3
 };
 
 int cur_dance (qk_tap_dance_state_t *state);
 void alt_finished (qk_tap_dance_state_t *state, void *user_data);
 void alt_reset (qk_tap_dance_state_t *state, void *user_data);
+void cmd_finished (qk_tap_dance_state_t *state, void *user_data);
+void cmd_reset (qk_tap_dance_state_t *state, void *user_data);
 
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-    [BASE] = LAYOUT(
+    [WINDOWS] = LAYOUT(
     //  1          2          3          4          5          6          7          8          9          10         11         12         13         14         15
-        KC_TAB ,   KC_Q,      KC_W,      KC_E,      KC_R,      KC_T,      KC_Y,      KC_U,      KC_I, LT(MOUSE,KC_O), KC_P,      KC_LBRC,
+        KC_TAB ,   KC_Q,      KC_W,      KC_E,      KC_R,      KC_T,      KC_Y,      KC_U,      KC_I, LT(MOUSE,KC_O), KC_P,      TO_MINIWIN,
         KC_BSPC,   KC_A,      KC_S,      KC_D,      KC_F,      KC_G,      KC_H,      KC_J,      KC_K,      KC_L,      KC_SCLN,   KC_QUOT,
         KC_LSFT,   KC_Z,      KC_X,      KC_C,      KC_V,      KC_B,      KC_N,      KC_M,      KC_COMM,   KC_DOT,    KC_SLSH,   KC_RSFT,
-        KC_LCTL,   KC_LGUI,   TD(ALT), LT(NUMBERS, KC_SPC),     LT(ARROWS, KC_ENT),  RCTL_T(KC_ESC), LT(FN, KC_DEL),      MO(MOUSE)),
+        KC_LCTL,   KC_LWIN,   TD(ALT), LT(NUMBERS, KC_SPC),     LT(ARROWS, KC_ENT),  RCTL_T(KC_ESC), LT(FN, KC_DEL),  TO_MAC),
+
+    [MACINTOSH] = LAYOUT(
+    //  1          2          3          4          5          6          7          8          9          10         11         12         13         14         15
+        _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   TO_MINIMAC,
+        _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,
+        _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,
+        _______,   KC_LOPT,   TD(CMD),   _______,              _______,   RCMD_T(KC_ESC),   _______,   TO_WIN),
 
     [NUMBERS] = LAYOUT(
     //  1          2          3          4          5          6          7          8          9          10         11         12         13         14         15
         KC_ZKHK,   KC_1,      KC_2,      KC_3,      KC_4,      KC_5,      KC_6,      KC_7,      KC_8,      KC_9,      KC_0,      KC_EQL,
-        _______,   _______,   _______,   _______,   _______,   _______,   _______,   KC_MINS,LSFT(KC_MINS),KC_EQL,    KC_PPLS,   _______,
+        _______,   _______,   _______,   _______,   _______,   _______,   KC_MINS,LSFT(KC_MINS),KC_EQL,    KC_PPLS,   _______,   _______,
         _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,
         _______,   _______,   _______,   _______,              KC_ENT,    _______,   _______,   _______),
 
@@ -113,6 +135,7 @@ static tap alttap_state = {
 
 qk_tap_dance_action_t tap_dance_actions[] = {
   [ALT]        = ACTION_TAP_DANCE_FN_ADVANCED(NULL,alt_finished, alt_reset),
+  [CMD]        = ACTION_TAP_DANCE_FN_ADVANCED(NULL,cmd_finished, cmd_reset),
 };
 
 //     _   _  _____    ___  ___ _      ___ _   _ _  _  ___ _____ ___ ___  _  _   _    ___   ___ ___ ___
@@ -144,6 +167,29 @@ void alt_reset (qk_tap_dance_state_t *state, void *user_data) {
   alttap_state.state = 0;
 }
 
+void cmd_finished (qk_tap_dance_state_t *state, void *user_data) {
+  alttap_state.state = cur_dance(state);
+  switch (alttap_state.state) {
+    case SINGLE_TAP: set_oneshot_layer(FN, ONESHOT_START); clear_oneshot_layer_state(ONESHOT_PRESSED); break;
+    case SINGLE_HOLD: register_code(KC_LCMD); break;
+    case DOUBLE_TAP: register_code(KC_LCMD); break;
+    case DOUBLE_HOLD: register_code(KC_LCMD); layer_on(FN); break;
+    //Last case is for fast typing. Assuming your key is `f`:
+    //For example, when typing the word `buffer`, and you want to make sure that you send `ff` and not `Esc`.
+    //In order to type `ff` when typing fast, the next character will have to be hit within the `TAPPING_TERM`, which by default is 200ms.
+  }
+}
+
+void cmd_reset (qk_tap_dance_state_t *state, void *user_data) {
+  switch (alttap_state.state) {
+    case SINGLE_TAP: break;
+    case SINGLE_HOLD: unregister_code(KC_LCMD); break;
+    case DOUBLE_TAP: unregister_code(KC_LCMD); break;
+    case DOUBLE_HOLD: layer_off(FN); unregister_code(KC_LCMD); break;
+  }
+  alttap_state.state = 0;
+}
+
 bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
 
   switch (keycode) {
@@ -166,6 +212,26 @@ bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
   return true;
 }
 
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+  switch(keycode) {
+    case TO_MAC:
+      if (!record->event.pressed) {
+        set_single_persistent_default_layer(MACINTOSH);
+      }
+      return false;
+    case TO_WIN:
+      if (!record->event.pressed) {
+        set_single_persistent_default_layer(WINDOWS);
+      }
+      return false;
+    case TO_MINIMAC:
+    case TO_MINIWIN:
+      return false;
+    default:
+      return true;
+  }
+}
+
 void persistent_default_layer_set(uint16_t default_layer) {
   eeconfig_update_default_layer(default_layer);
   default_layer_set(default_layer);
@@ -183,7 +249,8 @@ void matrix_scan_user(void) {
 
   if (old_layer != new_layer) {
     switch (new_layer) {
-      case BASE:
+      case WINDOWS:
+      case MACINTOSH:
           //rgblight_sethsv_noeeprom_azure();
           rgblight_sethsv_noeeprom (132, 102, rgblight_get_val());
         break;
