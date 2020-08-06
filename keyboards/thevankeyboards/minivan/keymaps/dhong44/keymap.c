@@ -81,7 +81,7 @@ LCTL_T(KC_BSPC),   LCTL_T(KC_A),      KC_S,      KC_D,      KC_F,      KC_G,    
     [NUMBERS] = LAYOUT(
     //  1          2          3          4          5          6          7          8          9          10         11         12         13         14         15
         KC_ZKHK,   KC_1,      KC_2,      KC_3,      KC_4,      KC_5,      KC_6,      KC_7,      KC_8,      KC_9,      RALT_T(KC_0),      KC_EQL,
-        _______,   LCTL_T(KC_ZKHK),   _______,   _______,   _______,   _______,   KC_MINS,LSFT(KC_MINS),KC_EQL,    KC_PPLS,   RCTL_T(KC_QUOT),   _______,
+        _______,   LCTL_T(KC_ZKHK),   _______,   _______,   _______,   _______,   KC_MINS,LSFT(KC_MINS),KC_EQL,    LSFT(KC_EQL),   RCTL_T(KC_QUOT),   _______,
         _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,
         _______,   _______,   _______,   _______,              KC_ENT,    _______,   _______,   _______),
 
