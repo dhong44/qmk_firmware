@@ -33,9 +33,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #undef SSD1306OLED
 
 #define TAPPING_TERM 200
+// #define TAPPING_FORCE_HOLD
+#undef PERMISSIVE_HOLD
+#define IGNORE_MOD_TAP_INTERRUPT_PER_KEY
+#define PERMISSIVE_HOLD_PER_KEY
+
 #define OLED_TIMEOUT_USER 30000
 #define OLED_TIMEOUT 0
 #define OLED_TIMEOUT_DISABLE
-// #define TAPPING_FORCE_HOLD
-#undef PERMISSIVE_HOLD
-#define IGNORE_MOD_TAP_INTERRUPT
+#define OLED_FONT_H "dhong44glcdfont.c"

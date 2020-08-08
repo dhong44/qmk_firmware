@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include QMK_KEYBOARD_H
 
 extern uint8_t is_master;
@@ -129,7 +130,7 @@ LCTL_T(KC_DELT),LCTL_T(KC_LEFT),KC_DOWN,KC_RIGHT,KC_PGDN,_______,               
   //,-----------------------------------------------------.                    ,-----------------------------------------------------.
       _______, _______, KC_BTN1, KC_MS_U, KC_BTN2, KC_PGUP,                      _______, _______, _______, _______, _______, _______,
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-      _______, _______, KC_MS_L, KC_MS_D, KC_MS_R, KC_PGDN,                      KC_WH_R, KC_WH_U, KC_WH_D, KC_WH_L, _______, _______,
+      _______, _______, KC_MS_L, KC_MS_D, KC_MS_R, KC_PGDN,                      KC_WH_R, KC_WH_D, KC_WH_U, KC_WH_L, _______, _______,
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
       _______, _______, _______, _______, _______, _______,                      _______, _______, _______, _______, _______, _______,\
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
@@ -141,7 +142,7 @@ LCTL_T(KC_DELT),LCTL_T(KC_LEFT),KC_DOWN,KC_RIGHT,KC_PGDN,_______,               
   //,-----------------------------------------------------.                    ,-----------------------------------------------------.
       _______, _______, KC_BTN1, KC_MS_U, KC_BTN2, KC_PGUP,                      _______, _______, _______, _______, _______, _______,
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-      _______, _______, KC_MS_L, KC_MS_D, KC_MS_R, KC_PGDN,                      KC_WH_R, KC_WH_D, KC_WH_U, KC_WH_L, _______, _______,
+      _______, _______, KC_MS_L, KC_MS_D, KC_MS_R, KC_PGDN,                      KC_WH_R, KC_WH_U, KC_WH_D, KC_WH_L, _______, _______,
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
       _______, _______, _______, _______, _______, _______,                      _______, _______, _______, _______, _______, _______,\
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
@@ -257,69 +258,106 @@ bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
   return true;
 }
 
-void persistent_default_layer_set(uint16_t default_layer) {
-  eeconfig_update_default_layer(default_layer);
-  default_layer_set(default_layer);
+bool get_permissive_hold(uint16_t keycode, keyrecord_t *record) {
+  switch (keycode) {
+    case LSFT_T(KC_Z):
+    case RSFT_T(KC_SLSH):
+      return true;
+    default:
+      return false;
+  }
+}
+
+bool get_ignore_mod_tap_interrupt(uint16_t keycode, keyrecord_t *record) {
+  switch(keycode) {
+    case LSFT_T(KC_Z):
+    case RSFT_T(KC_SLSH):
+      return false;
+    default:
+      return true;
+  }
 }
 
 const char *read_logo(void);
-const char *read_mode_icon(bool swap);
-const char *read_qmk_logo(void);
+void scrollSpeedChange(void);
 
-const char *read_qmk_logo(void) {
-  static char logo[] = {
-      0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89, 0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f, 0x90, 0x91, 0x92, 0x93, 0x94,
-      0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7, 0xa8, 0xa9, 0xaa, 0xab, 0xac, 0xad, 0xae, 0xaf, 0xb0, 0xb1, 0xb2, 0xb3, 0xb4,
-      0xc0, 0xc1, 0xc2, 0xc3, 0xc4, 0xc5, 0xc6, 0xc7, 0xc8, 0xc9, 0xca, 0xcb, 0xcc, 0xcd, 0xce, 0xcf, 0xd0, 0xd1, 0xd2, 0xd3, 0xd4,
-      0};
-
-  return logo;
-}
-
+static char osIcon[] = {
+  0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
+  0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
+  0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
+0};
 
 static uint32_t oled_timeout;
 
+void setOledOS(uint16_t OS) {
+  uint8_t base = (OS == MAC) ? 0x95 : 0x9d;
+  osIcon[10] = base;
+  osIcon[11] = base + 0x01;
+  osIcon[12] = base + 0x02;
+
+  osIcon[31] = base + 0x20;
+  osIcon[32] = base + 0x21;
+  osIcon[33] = base + 0x22;
+
+  osIcon[52] = base + 0x40;
+  osIcon[53] = base + 0x41;
+  osIcon[54] = base + 0x42;
+
+  oled_scroll_off();
+}
+
 oled_rotation_t oled_init_user(oled_rotation_t rotation) {
   oled_timeout = timer_read32() + OLED_TIMEOUT_USER;
-  // if (is_master) {
-  //   return OLED_ROTATION_180;  // flips the display 180 degrees if offhand
-  // }
+  oled_scroll_set_speed(5);
 
+  if (false) {
+    return OLED_ROTATION_180;  // flips the display 180 degrees if right hand
+  }
   return rotation;
 }
 
 void oled_task_user() {
   if (timer_expired32(timer_read32(), oled_timeout)) {
+    oled_scroll_off();
     oled_off();
     return;
   }
 
+  oled_on();
   if (is_master) {
-    oled_write_ln(read_mode_icon(IS_LAYER_ON(MAC)), false);
+    oled_write(osIcon, false);
   } else {
     oled_write(read_logo(), false);
   }
 }
 
-
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   if(record->event.pressed)
   {
     oled_timeout = timer_read32() + OLED_TIMEOUT_USER;
+
+    oled_scroll_left();
   }
 
   switch(keycode) {
     case TO_MAC:
       if (!record->event.pressed) {
         set_single_persistent_default_layer(MAC);
+        setOledOS(MAC);
       }
       return false;
     case TO_WIN:
       if (!record->event.pressed) {
         set_single_persistent_default_layer(WIN);
+        setOledOS(WIN);
       }
       return false;
     default:
       return true;
   }
+}
+
+
+void keyboard_post_init_user(void) {
+  setOledOS(biton((layer_state_t)eeconfig_read_default_layer()));
 }
