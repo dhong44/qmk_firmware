@@ -1,11 +1,5 @@
 #include QMK_KEYBOARD_H
 
-
-#ifdef RGBLIGHT_ENABLE
-//Following line allows macro to read current RGB settings
-extern rgblight_config_t rgblight_config;
-#endif
-
 extern uint8_t is_master;
 
 // Each layer gets a name for readability, which is then used in the keymap matrix below.
@@ -263,38 +257,13 @@ bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
   return true;
 }
 
-int RGB_current_mode;
-
 void persistent_default_layer_set(uint16_t default_layer) {
   eeconfig_update_default_layer(default_layer);
   default_layer_set(default_layer);
 }
 
-// Setting ADJUST layer RGB back to default
-// void update_tri_layer_RGB(uint8_t layer1, uint8_t layer2, uint8_t layer3) {
-//   if (IS_LAYER_ON(layer1) && IS_LAYER_ON(layer2)) {
-//     layer_on(layer3);
-//   } else {
-//     layer_off(layer3);
-//   }
-// }
-
-void matrix_init_user(void) {
-    #ifdef RGBLIGHT_ENABLE
-      RGB_current_mode = rgblight_config.mode;
-    #endif
-    //SSD1306 OLED init, make sure to add #define SSD1306OLED in config.h
-    #ifdef SSD1306OLED
-        iota_gfx_init(!has_usb());   // turns on the display
-    #endif
-}
-
-//SSD1306 OLED update loop, make sure to add #define SSD1306OLED in config.h
-#ifdef SSD1306OLED
-
-// When add source files to SRC in rules.mk, you can use functions.
-// const char *read_layer_state(void);
 const char *read_logo(void);
+const char *read_mode_icon(bool swap);
 const char *read_qmk_logo(void);
 
 const char *read_qmk_logo(void) {
@@ -306,65 +275,38 @@ const char *read_qmk_logo(void) {
 
   return logo;
 }
-// void set_keylog(uint16_t keycode, keyrecord_t *record);
-// const char *read_keylog(void);
-// const char *read_keylogs(void);
 
-// const char *read_mode_icon(bool swap);
-// const char *read_host_led_state(void);
-// void set_timelog(void);
-const char *read_timelog(void);
 
-void matrix_scan_user(void) {
-   iota_gfx_task();
+static uint32_t oled_timeout;
+
+oled_rotation_t oled_init_user(oled_rotation_t rotation) {
+  oled_timeout = timer_read32() + OLED_TIMEOUT_USER;
+  // if (is_master) {
+  //   return OLED_ROTATION_180;  // flips the display 180 degrees if offhand
+  // }
+
+  return rotation;
 }
 
-static void render_logo(void) {
-    static const char PROGMEM qmk_logo[] = {
-        0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89, 0x8A, 0x8B, 0x8C, 0x8D, 0x8E, 0x8F, 0x90, 0x91, 0x92, 0x93, 0x94,
-        0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5, 0xA6, 0xA7, 0xA8, 0xA9, 0xAA, 0xAB, 0xAC, 0xAD, 0xAE, 0xAF, 0xB0, 0xB1, 0xB2, 0xB3, 0xB4,
-        0xC0, 0xC1, 0xC2, 0xC3, 0xC4, 0xC5, 0xC6, 0xC7, 0xC8, 0xC9, 0xCA, 0xCB, 0xCC, 0xCD, 0xCE, 0xCF, 0xD0, 0xD1, 0xD2, 0xD3, 0xD4, 0x00
-    };
+void oled_task_user() {
+  if (timer_expired32(timer_read32(), oled_timeout)) {
+    oled_off();
+    return;
+  }
 
-    oled_write_P(qmk_logo, false);
-}
-
-void matrix_render_user(struct CharacterMatrix *matrix) {
   if (is_master) {
-    // If you want to change the display of OLED, you need to change here
-    // matrix_write_ln(matrix, read_layer_state());
-    // matrix_write_ln(matrix, read_keylog());
-    //matrix_write_ln(matrix, read_keylogs());
-    // matrix_write_ln(matrix, read_mode_icon(keymap_config.swap_lalt_lgui));
-    //matrix_write_ln(matrix, read_host_led_state());
-    // matrix_write_ln(matrix, read_timelog());
-    render_logo();
+    oled_write_ln(read_mode_icon(IS_LAYER_ON(MAC)), false);
   } else {
-    matrix_write(matrix, read_logo());
+    oled_write(read_logo(), false);
   }
 }
 
-void matrix_update(struct CharacterMatrix *dest, const struct CharacterMatrix *source) {
-  if (memcmp(dest->display, source->display, sizeof(dest->display))) {
-    memcpy(dest->display, source->display, sizeof(dest->display));
-    dest->dirty = true;
-  }
-}
-
-void iota_gfx_task_user(void) {
-  struct CharacterMatrix matrix;
-  matrix_clear(&matrix);
-  matrix_render_user(&matrix);
-  matrix_update(&display, &matrix);
-}
-#endif//SSD1306OLED
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-  // if (record->event.pressed) {
-#ifdef SSD1306OLED
-    // set_keylog(keycode, record);
-#endif
-  // }
+  if(record->event.pressed)
+  {
+    oled_timeout = timer_read32() + OLED_TIMEOUT_USER;
+  }
 
   switch(keycode) {
     case TO_MAC:
