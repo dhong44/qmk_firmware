@@ -8,6 +8,7 @@
 #include "suspend.h"
 #include "timer.h"
 #include "led.h"
+// #include "oled_driver.h"
 #include "host.h"
 
 #ifdef PROTOCOL_LUFA
@@ -116,6 +117,7 @@ static void power_down(uint8_t wdto) {
     sei();
     sleep_cpu();
     sleep_disable();
+    // oled_off();
 
     // Disable watchdog after sleep
     wdt_disable();

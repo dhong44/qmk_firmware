@@ -270,7 +270,6 @@ bool get_permissive_hold(uint16_t keycode, keyrecord_t *record) {
 
 bool get_ignore_mod_tap_interrupt(uint16_t keycode, keyrecord_t *record) {
   switch(keycode) {
-    case LSFT_T(KC_Z):
     case RSFT_T(KC_SLSH):
       return false;
     default:
@@ -278,78 +277,78 @@ bool get_ignore_mod_tap_interrupt(uint16_t keycode, keyrecord_t *record) {
   }
 }
 
-const char *read_logo(void);
-void scrollSpeedChange(void);
+// const char *read_logo(void);
+// void scrollSpeedChange(void);
 
-static char osIcon[] = {
-  0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
-  0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
-  0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
-0};
+// static char osIcon[] = {
+//   0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
+//   0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
+//   0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
+// 0};
 
-static uint32_t oled_timeout;
+// static uint32_t oled_timeout;
 
-void setOledOS(uint16_t OS) {
-  uint8_t base = (OS == MAC) ? 0x95 : 0x9d;
-  osIcon[10] = base;
-  osIcon[11] = base + 0x01;
-  osIcon[12] = base + 0x02;
+// void setOledOS(uint16_t OS) {
+//   uint8_t base = (OS == MAC) ? 0x95 : 0x9d;
+//   osIcon[10] = base;
+//   osIcon[11] = base + 0x01;
+//   osIcon[12] = base + 0x02;
 
-  osIcon[31] = base + 0x20;
-  osIcon[32] = base + 0x21;
-  osIcon[33] = base + 0x22;
+//   osIcon[31] = base + 0x20;
+//   osIcon[32] = base + 0x21;
+//   osIcon[33] = base + 0x22;
 
-  osIcon[52] = base + 0x40;
-  osIcon[53] = base + 0x41;
-  osIcon[54] = base + 0x42;
+//   osIcon[52] = base + 0x40;
+//   osIcon[53] = base + 0x41;
+//   osIcon[54] = base + 0x42;
 
-  oled_scroll_off();
-}
+//   oled_scroll_off();
+// }
 
-oled_rotation_t oled_init_user(oled_rotation_t rotation) {
-  oled_timeout = timer_read32() + OLED_TIMEOUT_USER;
-  oled_scroll_set_speed(5);
+// oled_rotation_t oled_init_user(oled_rotation_t rotation) {
+//   oled_timeout = timer_read32() + OLED_TIMEOUT_USER;
+//   oled_scroll_set_speed(5);
 
-  if (false) {
-    return OLED_ROTATION_180;  // flips the display 180 degrees if right hand
-  }
-  return rotation;
-}
+//   if (false) {
+//     return OLED_ROTATION_180;  // flips the display 180 degrees if right hand
+//   }
+//   return rotation;
+// }
 
-void oled_task_user() {
-  if (timer_expired32(timer_read32(), oled_timeout)) {
-    oled_scroll_off();
-    oled_off();
-    return;
-  }
+// void oled_task_user() {
+//   if (timer_expired32(timer_read32(), oled_timeout)) {
+//     oled_scroll_off();
+//     oled_off();
+//     return;
+//   }
 
-  oled_on();
-  if (is_master) {
-    oled_write(osIcon, false);
-  } else {
-    oled_write(read_logo(), false);
-  }
-}
+//   oled_on();
+//   if (is_master) {
+//     oled_write(osIcon, false);
+//   } else {
+//     oled_write(read_logo(), false);
+//   }
+// }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-  if(record->event.pressed)
-  {
-    oled_timeout = timer_read32() + OLED_TIMEOUT_USER;
+  // if(record->event.pressed)
+  // {
+  //   oled_timeout = timer_read32() + OLED_TIMEOUT_USER;
 
-    oled_scroll_left();
-  }
+  //   oled_scroll_left();
+  // }
 
   switch(keycode) {
     case TO_MAC:
       if (!record->event.pressed) {
         set_single_persistent_default_layer(MAC);
-        setOledOS(MAC);
+        // setOledOS(MAC);
       }
       return false;
     case TO_WIN:
       if (!record->event.pressed) {
         set_single_persistent_default_layer(WIN);
-        setOledOS(WIN);
+        // setOledOS(WIN);
       }
       return false;
     default:
@@ -359,5 +358,5 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
 
 void keyboard_post_init_user(void) {
-  setOledOS(biton((layer_state_t)eeconfig_read_default_layer()));
+  // setOledOS(biton((layer_state_t)eeconfig_read_default_layer()));
 }

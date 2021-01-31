@@ -2,10 +2,11 @@ TAP_DANCE_ENABLE = yes
 EXTRAKEY_ENABLE = yes
 BOOTLOADER = atmel-dfu
 LOCAL_GLCDFONT = yes
+SLEEP_LED_ENABLE = no
 
-OLED_DRIVER_ENABLE = yes
+#OLED_DRIVER_ENABLE = yes
 # If you want to change the display of OLED, you need to change here
-SRC +=  ./lib/logo_reader.c \
+# SRC +=  ./lib/logo_reader.c \
         # ./lib/timelogger.c \
         # ./lib/mode_icon_reader.c \
         # ./lib/keylogger.c \
